@@ -10,8 +10,6 @@ if __name__ == "__main__":
         description="""Generates information about an elliptic curve and
 a picks a random point to demonstrate.""",
         epilog="""
-MIT License
-
 Copyright (c) 2018 Christopher Robert Philabaum <cp723@nau.edu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
