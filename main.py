@@ -8,7 +8,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""Generates information about an elliptic curve and
-a picks a random point to demonstrate.""")\
+a picks a random point to demonstrate.""",
+        epilog="""
+Copyright (c) 2018 Christopher Robert Philabaum <cp723@nau.edu>
+""")
 
     parser.add_argument("modulo", type=int,
                         help="The modulo of the curve. It must be prime and"
