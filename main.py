@@ -1,10 +1,12 @@
 import sys
 import random
 import argparse
+from pathlib import Path
 
 from eulerlib.numtheory import Divisors
 
 from ecc import EllipticCurve
+from plot import plot_curve
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -42,6 +44,9 @@ SOFTWARE.
                         help="An optional x, y coordinate for the starting"
                              " point. The point has to exist on"
                              " the curve.")
+    parser.add_argument("-p", "--path", default=None, type=str,
+                        help="An optional path to save the plot as a .png. If"
+                             " not provided, then no file will be saved.")
 
     args = parser.parse_args()
 
@@ -57,6 +62,10 @@ SOFTWARE.
         start = random.choice(points)
     else:
         start = tuple(args.start)
+    
+    plot_path = None
+    if args.path is not None:
+        plot_path = Path(args.path)
 
     generated_points = list(curve.generate(start))
     for index, point in enumerate(generated_points, 1):
@@ -113,3 +122,8 @@ SOFTWARE.
         len(points), int(Divisors().phi(len(points)))))
     print("\tActual:", len(primitive_elements))
     print()
+
+    if plot_path is not None:
+        print("Saving plot to '{}'...".format(plot_path))
+        plot_curve(curve, plot_path)
+        print()
