@@ -2,6 +2,8 @@ import sys
 import random
 import argparse
 
+from eulerlib.numtheory import Divisors
+
 from ecc import EllipticCurve
 
 if __name__ == "__main__":
@@ -36,15 +38,9 @@ SOFTWARE.
                             " greater than 3.")
     parser.add_argument("A", type=int, help="The A parameter of the curve.")
     parser.add_argument("B", type=int, help="The B parameter of the curve.")
-    parser.add_argument("-x", default=None, type=int,
-                        help="An optional x coordinate for the starting point."
-                             " If provided, than you must provide the y"
-                             " coordinate as well. The point has to exist on"
-                             " the curve.")
-    parser.add_argument("-y", default=None, type=int,
-                        help="An optional y coordinate for the starting point."
-                             " If provided, than you must provide the x"
-                             " coordinate as well. The point has to exist on"
+    parser.add_argument("-s", "--start", default=None, type=int, nargs=2,
+                        help="An optional x, y coordinate for the starting"
+                             " point. The point has to exist on"
                              " the curve.")
 
     args = parser.parse_args()
@@ -55,30 +51,65 @@ SOFTWARE.
         print("Error: {}".format(err), file=sys.stderr)
         sys.exit(1)
 
-    if args.x is None and args.y is None:
-        rand_start = random.choice(list(curve.get_points()))
-    elif args.x is None or args.x is None:
-        print("Both (x, y) must be provided to make sense!", file=sys.stderr)
-        sys.exit(1)
-    else:
-        rand_start = (args.x, args.y)
+    points = list(curve.get_points())
 
-    for index, point in enumerate(curve.generate(rand_start), 1):
+    if args.start is None:
+        start = random.choice(points)
+    else:
+        start = tuple(args.start)
+
+    generated_points = list(curve.generate(start))
+    for index, point in enumerate(generated_points, 1):
         print("{}P: {}".format(index, point))
 
     print()
 
-    for _ in range(5):
-        points = random.choices(list(curve.get_points()), k=2)
-        print("{} + {} = {}".format(points[0], points[1],
-                                    curve.add(points[0], points[1])))
+    # Point must be a generator of the group for the result to be guaranteed
+    # to exist amongst the subgroup.
+    if len(generated_points) == len(points):
+        print("Example (Addition):")
+        for _ in range(5):
+            add_points = [random.choice(generated_points) for _ in range(2)]
+            add_points_indices = [
+                generated_points.index(point) + 1 for point in add_points
+            ]
+
+            result = curve.add(add_points[0], add_points[1])
+            result_pos = generated_points.index(result) + 1
+
+            predicted_point_pos = (sum(add_points_indices)
+                % len(generated_points))
+            # We want to refer to 0P as (#E)P
+            if predicted_point_pos == 0:
+                predicted_point_pos = len(generated_points)
+            # Make sure to have the prediction position to be 0-based.
+            predicted_point = generated_points[predicted_point_pos - 1]
+
+            print("{}P {} + {}P {} =".format(
+                add_points_indices[0], points[0],
+                add_points_indices[1], points[1]
+            ))
+            print("\tPredicted: {}P {}".format(predicted_point_pos,
+                                               predicted_point))
+            print("\tActual: {}P {}".format(result_pos, result))
+        print()
+    else:
+        print("Warning: {} is a not a primitive element, so we cannot safely"
+              " show addition".format(start), file=sys.stderr)
+        print()
+
+    primitive_elements = []
+
+    for s in curve.get_points():
+        print("Start: {}, Order: {}".format(s,
+                                            len(list(curve.generate(s)))))
+        if len(list(curve.generate(s))) == len(points):
+            primitive_elements.append(s)
 
     print()
-
-    for start in curve.get_points():
-        print("Start: {}, Order: {}".format(start,
-                                            len(list(curve.generate(start)))))
-
-    print()
-    print("Order of the Group:", len(curve.get_points()))
+    print("Order of the Group:", len(points))
+    print("# of Generators:")
+    print("\tPredicted: \u03d5({}) = {}".format(
+        len(points), int(Divisors().phi(len(points)))))
+    print("\tActual:", len(primitive_elements))
     print()
