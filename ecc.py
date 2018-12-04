@@ -93,7 +93,7 @@ class EllipticCurve:
         points = []
 
         # By Euler's Criterion, we return an empty list if no solutions exist.
-        if pow(a, (p - 1) // 2, p) != 1:
+        if pow(a, (p - 1) // 2, p) == -1:
             return points
 
         # Iteratively check every point from 0 to p - 1 if its square equals
