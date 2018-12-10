@@ -73,39 +73,33 @@ SOFTWARE.
 
     print()
 
-    # Point must be a generator of the group for the result to be guaranteed
-    # to exist amongst the subgroup.
-    if len(generated_points) == len(points):
-        print("Example (Addition):")
-        for _ in range(5):
-            add_points = [random.choice(generated_points) for _ in range(2)]
-            add_points_indices = [
-                generated_points.index(point) + 1 for point in add_points
-            ]
+    print("Example (Addition):")
+    for _ in range(5):
+        add_points = [random.choice(generated_points) for _ in range(2)]
+        add_points_indices = [
+            generated_points.index(point) + 1 for point in add_points
+        ]
 
-            result = curve.add(add_points[0], add_points[1])
-            result_pos = generated_points.index(result) + 1
+        result = curve.add(add_points[0], add_points[1])
+        result_pos = generated_points.index(result) + 1
 
-            predicted_point_pos = (sum(add_points_indices)
-                % len(generated_points))
-            # We want to refer to 0P as (#E)P
-            if predicted_point_pos == 0:
-                predicted_point_pos = len(generated_points)
-            # Make sure to have the prediction position to be 0-based.
-            predicted_point = generated_points[predicted_point_pos - 1]
+        predicted_point_pos = (sum(add_points_indices)
+            % len(generated_points))
+        # We want to refer to 0P as (#E)P
+        if predicted_point_pos == 0:
+            predicted_point_pos = len(generated_points)
+        # Make sure to have the prediction position to be 0-based.
+        predicted_point = generated_points[predicted_point_pos - 1]
 
-            print("{}P {} + {}P {} =".format(
-                add_points_indices[0], add_points[0],
-                add_points_indices[1], add_points[1]
-            ))
-            print("\tPredicted: {}P {}".format(predicted_point_pos,
-                                               predicted_point))
-            print("\tActual: {}P {}".format(result_pos, result))
-        print()
-    else:
-        print("Warning: {} is a not a primitive element, so we cannot safely"
-              " show addition".format(start), file=sys.stderr)
-        print()
+        print("{}P {} + {}P {} =".format(
+            add_points_indices[0], add_points[0],
+            add_points_indices[1], add_points[1]
+        ))
+        print("\tPredicted: {}P {}".format(predicted_point_pos,
+                                            predicted_point))
+        print("\tActual: {}P {}".format(result_pos, result))
+
+    print()
 
     primitive_elements = []
 
