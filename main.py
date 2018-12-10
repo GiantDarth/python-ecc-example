@@ -95,8 +95,8 @@ SOFTWARE.
             predicted_point = generated_points[predicted_point_pos - 1]
 
             print("{}P {} + {}P {} =".format(
-                add_points_indices[0], points[0],
-                add_points_indices[1], points[1]
+                add_points_indices[0], add_points[0],
+                add_points_indices[1], add_points[1]
             ))
             print("\tPredicted: {}P {}".format(predicted_point_pos,
                                                predicted_point))
